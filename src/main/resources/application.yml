@@ -1,0 +1,30 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+spring:
+  application:
+    name: ecommerce-backend
+
+datasource:
+  url: jdbc:postgresql://localhost:5432/ecommerce
+  username: ${DB_USERNAME:ecommerce}
+  password: ${DB_PASSWORD:password}
+  driver-class-name: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 20
+    minimum-idle: 5
+    connection-timeout: 30000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+
+jpa:
+  hibernate:
+    ddl-auto: validate
+  show-sql: false
+  properties:
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      format_sql: true
+      use_sql_comments: true
