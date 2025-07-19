@@ -1,11 +1,23 @@
 package com.ecommerce.auth.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Category Response Schema")
 public class CategoryResponse {
-
-    @Schema(description = "Category ID", example = "1")
+    @Schema(description = "Category unique identifier", example = "1")
     private Long id;
 
     @Schema(description = "Category name", example = "Electronics")
@@ -14,29 +26,17 @@ public class CategoryResponse {
     @Schema(description = "Category description", example = "Electronic devices and accessories")
     private String description;
 
-    @Schema(description = "Category slug", example = "electronics")
-    private String slug;
+    @Schema(description = "Category active status", example = "true")
+    private Boolean active;
 
-    @Schema(description = "Category image URL")
-    private String imageUrl;
+    @Schema(description = "Number of products in this category", example = "25")
+    private Integer productCount;
 
-    @Schema(description = "Parent category ID", example = "2")
-    private Long parentId;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "Category creation timestamp", example = "2024-01-15 10:30:00")
+    private LocalDateTime createdAt;
 
-    @Schema(description = "Parent category name", example = "Technology")
-    private String parentName;
-
-
-    public CategoryResponse() {
-    }
-
-    public CategoryResponse(Long id, String name, String description, String slug, String imageUrl, Long parentId, String parentName) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.slug = slug;
-        this.imageUrl = imageUrl;
-        this.parentId = parentId;
-        this.parentName = parentName;
-    }
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Schema(description = "Category last update timestamp", example = "2024-01-16 14:20:00")
+    private LocalDateTime updatedAt;
 }

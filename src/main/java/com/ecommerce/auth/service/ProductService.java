@@ -1,5 +1,7 @@
 package com.ecommerce.auth.service;
 
+import com.ecommerce.auth.dto.request.CreateProductRequest;
+import com.ecommerce.auth.dto.request.UpdateProductRequest;
 import com.ecommerce.auth.dto.response.PageResponse;
 import com.ecommerce.auth.dto.response.ProductResponse;
 import com.ecommerce.auth.model.Category;
@@ -9,14 +11,15 @@ import com.ecommerce.auth.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,7 +72,7 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "products",, key = "#id")
+    @Cacheable(value = "products", key = "#id")
     public ProductResponse getProductById(Long id) {
         String cacheKey = PRODUCT_CACHE_KEY + id;
         ProductResponse cachedProduct = (ProductResponse) redisTemplate.opsForValue().get(cacheKey);
@@ -118,6 +121,56 @@ public class ProductService {
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .build();
+    }
+
+    public ProductResponse updateProduct(Long id, UpdateProductRequest request) {
+        Product product = productRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+
+        // Update category if provided
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+            product.setCategory(category);
+        }
+
+        // Update other fields
+        if (request.getName() != null) {
+            product.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            product.setDescription(request.getDescription());
+        }
+        if (request.getPrice() != null) {
+            product.setPrice(request.getPrice());
+        }
+        if (request.getStockQuantity() != null) {
+            product.setStockQuantity(request.getStockQuantity());
+        }
+        if (request.getSku() != null) {
+            product.setSku(request.getSku());
+        }
+
+        Product updatedProduct = productRepository.save(product);
+
+        // Clear cache for this product
+        String cacheKey = PRODUCT_CACHE_KEY + id;
+        redisTemplate.delete(cacheKey);
+
+        return convertToResponse(updatedProduct);
+    }
+
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+
+        // Soft delete - set active to false
+        product.setActive(false);
+        productRepository.save(product);
+
+        // Clear cache for this product
+        String cacheKey = PRODUCT_CACHE_KEY + id;
+        redisTemplate.delete(cacheKey);
     }
 
 }

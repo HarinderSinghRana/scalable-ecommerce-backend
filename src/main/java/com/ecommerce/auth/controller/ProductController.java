@@ -1,5 +1,7 @@
 package com.ecommerce.auth.controller;
 
+import com.ecommerce.auth.dto.request.CreateProductRequest;
+import com.ecommerce.auth.dto.request.UpdateProductRequest;
 import com.ecommerce.auth.dto.response.PageResponse;
 import com.ecommerce.auth.dto.response.ProductResponse;
 import com.ecommerce.auth.service.ProductService;
