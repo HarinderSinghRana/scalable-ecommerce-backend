@@ -1,6 +1,9 @@
 package com.ecommerce.auth.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,11 +15,19 @@ import java.util.Objects;
 
 @Entity
 @Table(name="carts")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@ToString(exclude = {"relationshipFields"}) // Exclude lazy/circular fields
+@EqualsAndHashCode(exclude = {"relationshipFields"}) // Exclude collections
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -33,15 +44,9 @@ public class Cart {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();
-
-    // Constructors
-    public Cart() {}
-
-    public Cart(User user) {
-        this.user = user;
-    }
 
     // Business methods
     public void addItem(Product product, Integer quantity) {

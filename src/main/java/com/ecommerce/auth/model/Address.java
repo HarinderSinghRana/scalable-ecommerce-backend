@@ -1,9 +1,18 @@
 package com.ecommerce.auth.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.*;
 
 @Embeddable
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@ToString(exclude = {"relationshipFields"}) // Exclude lazy/circular fields
+@EqualsAndHashCode(exclude = {"relationshipFields"}) // Exclude collections
 public class Address {
     @Column(name = "street")
     private String street;
@@ -19,33 +28,6 @@ public class Address {
 
     @Column(name = "zip_code")
     private String zipCode;
-
-    // Constructors
-    public Address() {}
-
-    public Address(String street, String city, String state, String country, String zipCode) {
-        this.street = street;
-        this.city = city;
-        this.state = state;
-        this.country = country;
-        this.zipCode = zipCode;
-    }
-
-    // Getters and setters
-    public String getStreet() { return street; }
-    public void setStreet(String street) { this.street = street; }
-
-    public String getCity() { return city; }
-    public void setCity(String city) { this.city = city; }
-
-    public String getState() { return state; }
-    public void setState(String state) { this.state = state; }
-
-    public String getCountry() { return country; }
-    public void setCountry(String country) { this.country = country; }
-
-    public String getZipCode() { return zipCode; }
-    public void setZipCode(String zipCode) { this.zipCode = zipCode; }
 
     @Override
     public String toString() {
